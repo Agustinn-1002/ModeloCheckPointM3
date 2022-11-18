@@ -37,7 +37,7 @@ module.exports = {
       email,
       name,
       plan:'regular',
-      watchet:[] 
+      watched:[] 
     };
     users.push(user);
     return `Usuario ${email} creado correctamente`;
@@ -115,12 +115,16 @@ module.exports = {
     // En caso exitoso, añadir el nombre (solo el nombre) de la serie a la propiedad <watched> del usuario.
     // Devuelve un mensaje con el formato: 'Reproduciendo <nombre de serie>'
     
-    if(!users.some(e => e.email === email)) throw Error ("Usuario inexistente")
-    if(!series.some(e => e.name === serie)) throw Error('Serie inexistente');
-    let userPlan = users.find(e => e.email === email);
+    let userPlan = users.find(e => e.email === email);  // Gracias al metodo Find podemos Encontrar un objeto en un array por una de sus propiedades
     let seriePlan = series.find(e => e.name === serie);
-    if(userPlan.plan !== 'premium' && seriePlan.category === 'premium')  throw Error('Contenido no disponible, contrata ahora HenryFlix Premium!');
-
+    // validaciones
+    if(!userPlan) throw Error ("Usuario inexistente")
+    if(!seriePlan) throw Error('Serie inexistente');
+    if(userPlan.plan !== 'premium' && seriePlan.category === 'premium') 
+      throw Error('Contenido no disponible, contrata ahora HenryFlix Premium!');
+    //Agregado y reproducir
+    userPlan.watched.push(seriePlan.name);
+    return `Reproduciendo ${serie}`
   },
 
   watchAgain: function (email) {
