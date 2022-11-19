@@ -130,6 +130,9 @@ module.exports = {
   watchAgain: function (email) {
     // Devuelve sólo las series ya vistas por el usuario
     // Si el usuario no existe, arroja el Error ('Usuario inexistente')
+    let userPlan = users.find(e => e.email === email);
+    if(!userPlan) throw Error ("Usuario inexistente")
+    return userPlan.watched
   },
 
   rateSerie: function (serie, email, score) {
@@ -141,5 +144,24 @@ module.exports = {
     // Si la serie no existe, arroja el Error ('Serie inexistente') y no actualiza el puntaje.
     // Debe recibir un puntaje entre 1 y 5 inclusive. En caso contrario arroja el Error ('Puntaje inválido') y no actualiza el puntaje.
     // Si el usuario no reprodujo la serie, arroja el Error ('Debes reproducir el contenido para poder puntuarlo') y no actualiza el puntaje. >> Hint: pueden usar la función anterior
+
+    let seriePlan = series.find(e => e.name === serie);
+    let userPlan = users.find(e => e.email === email); 
+
+    if(!userPlan) throw Error ("Usuario inexistente")
+    if(!seriePlan) throw Error('Serie inexistente');
+    if(score < 1 || score > 5) throw Error('Puntaje inválido');
+    if(!userPlan.watched.some(e=>e === serie)) throw Error('Debes reproducir el contenido para poder puntuarlo')
+
+    seriePlan.reviews.push({email,score})
+    let result = 0
+    for (let i of seriePlan.reviews){
+      result += i.score
+    }
+    let prom = result / seriePlan.reviews.length;
+    seriePlan.rating = prom;
+
+    return `Le has dado ${score} puntos a la serie ${serie}`
+
   },
 };
